@@ -11,8 +11,19 @@ public class VillagePatterGanerator : MonoBehaviour
     public Dictionary<Vector2Int, Tile> tiles = new Dictionary<Vector2Int, Tile>();
     public List<GameObject> tileOptions = new List<GameObject>();
     public List<GameObject> tileHouseOptions = new List<GameObject>();
-    
+    public bool useSeed;
+    public int seed;
+
     public void Generate() {
+        if (useSeed) {
+            Random.seed = seed;
+        }
+        else {
+            var randomizer = new System.Random();
+            int randomSeed = randomizer.Next(int.MinValue,int.MaxValue);
+            Random.InitState(randomSeed);
+        }
+        
         StopCoroutine(Generatator());
         Clear();
         crossCount = 0;

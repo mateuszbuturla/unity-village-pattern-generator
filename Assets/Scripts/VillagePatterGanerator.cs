@@ -6,23 +6,36 @@ public class VillagePatterGanerator : MonoBehaviour
 {
     public int maxCross;
     public int crossCount = 0;
+    public GameObject startObjPrefab;
     public Tile startObj;
     public Dictionary<Vector2Int, Tile> tiles = new Dictionary<Vector2Int, Tile>();
     public List<GameObject> tileOptions = new List<GameObject>();
     public List<GameObject> tileHouseOptions = new List<GameObject>();
+    
+    public void Generate() {
+        StopCoroutine(Generatator());
+        Clear();
+        crossCount = 0;
+        tiles = new Dictionary<Vector2Int, Tile>();
 
-    private void Start()
-    {
+        startObj = Instantiate(startObjPrefab, new Vector3(0, 0, 0), Quaternion.identity).GetComponent<Tile>();
+
         tiles.Add(new Vector2Int(0,0), startObj);
 
-        StartCoroutine(Generate());
+        StartCoroutine(Generatator());
+    }
+
+    private void Clear() {
+        foreach (KeyValuePair<Vector2Int, Tile> keyValue in tiles) {
+            Destroy(keyValue.Value.gameObject);
+        }
     }
 
     public void IncreaseCrossCount() {
         crossCount++;
     }
 
-    IEnumerator Generate () {
+    IEnumerator Generatator () {
         List<Tile> tempTiles = new List<Tile>();
 
         foreach (KeyValuePair<Vector2Int, Tile> keyValue in tiles) {
@@ -58,9 +71,13 @@ public class VillagePatterGanerator : MonoBehaviour
                 GeneratorHelper.RemoveDirectionsOfNeighboringTileFromNewTile(newTile, newPos);
             }
             GeneratorHelper.RemoveDirectionFromCurrentTile(currentTile, dir);
-        }
 
-        yield return new WaitForSeconds(0f);
-        StartCoroutine(Generate());
+            yield return new WaitForSeconds(0f);
+            StartCoroutine(Generatator());
+        }
+        else {
+            yield return new WaitForSeconds(0f);
+            StopCoroutine(Generatator());
+        }
     }
 }
